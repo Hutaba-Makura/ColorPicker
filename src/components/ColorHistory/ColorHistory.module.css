@@ -1,0 +1,5 @@
+.history { display: flex; flex-direction: column; gap: 8px; }
+.history h2 { margin: 0; font-size: 1rem; }
+.grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.item { width: 48px; height: 48px; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; }
+.item:hover, .item:focus-visible { outline: 2px solid #333; outline-offset: 2px; }

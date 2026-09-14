@@ -1,0 +1,5 @@
+.data { display: flex; flex-direction: column; gap: 12px; }
+.swatch { width: 64px; height: 64px; border: 1px solid #ccc; border-radius: 4px; }
+.values { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; margin: 0; }
+.values dt { font-weight: 600; }
+.values dd { margin: 0; font-family: monospace; }

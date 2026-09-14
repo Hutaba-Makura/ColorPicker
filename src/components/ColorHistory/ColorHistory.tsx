@@ -1,4 +1,5 @@
 import type { ColorHistoryItem } from '@/types/color';
+import styles from './ColorHistory.module.css';
 
 type ColorHistoryProps = {
   history: ColorHistoryItem[];
@@ -7,9 +8,9 @@ type ColorHistoryProps = {
 
 export default function ColorHistory({ history, onSelect }: ColorHistoryProps) {
   return (
-    <section aria-label="色の履歴">
+    <section className={styles.history} aria-label="色の履歴">
       <h2>履歴</h2>
-      <div role="list" style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)' }}>
+      <div className={styles.grid} role="list">
         {history.map((item) => (
           <button
             key={item.id}
@@ -18,7 +19,8 @@ export default function ColorHistory({ history, onSelect }: ColorHistoryProps) {
             aria-label={`${item.hex}を選択`}
             title={item.hex}
             onClick={() => onSelect(item)}
-            style={{ backgroundColor: item.hex, width: 48, height: 48 }}
+            className={styles.item}
+            style={{ backgroundColor: item.hex }}
           />
         ))}
       </div>

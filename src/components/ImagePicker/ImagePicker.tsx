@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 import type { ChangeEvent, PointerEvent } from 'react';
 import type { Color } from '@/types/color';
 import { colorFromRgb } from '@/utils/color';
+import styles from './ImagePicker.module.css';
 
 type ImagePickerProps = {
   onColorPick: (color: Color) => void;
@@ -51,13 +52,13 @@ export default function ImagePicker({ onColorPick }: ImagePickerProps) {
   };
 
   return (
-    <section>
+    <section className={styles.picker}>
       <label>
         画像を選択
-        <input type="file" accept="image/png,image/jpeg,image/webp,image/gif" onChange={handleFileChange} />
+        <input className={styles.input} type="file" accept="image/png,image/jpeg,image/webp,image/gif" onChange={handleFileChange} />
       </label>
       {imageUrl && (
-        <img ref={imageRef} src={imageUrl} alt="色を選択する画像" onPointerDown={handlePointerDown} />
+        <div className={styles.viewport}><img className={styles.image} ref={imageRef} src={imageUrl} alt="色を選択する画像" onPointerDown={handlePointerDown} /></div>
       )}
     </section>
   );
