@@ -1,0 +1,3 @@
+.picker { position: relative; width: 240px; height: 240px; }
+.hueRing { width: 100%; height: 100%; border-radius: 50%; cursor: crosshair; background: conic-gradient(red, yellow, lime, cyan, blue, magenta, red); }
+.svSquare { position: absolute; inset: 38px; cursor: crosshair; }
