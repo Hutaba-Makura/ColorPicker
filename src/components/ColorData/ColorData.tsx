@@ -36,13 +36,14 @@ export default function ColorData({ color, onChange }: ColorDataProps) {
   const numberInput = (label: string, value: string, onValue: (value: string) => void, min: number, max: number) => (
     <label className={styles.field}><span>{label}</span><input type="number" value={value} min={min} max={max} step="any" onChange={(event) => onValue(event.target.value)} /></label>
   );
+  const copy = (value: string) => { void navigator.clipboard?.writeText(value); };
 
   return <section className={styles.data} aria-label="選択中の色">
     <div aria-label={`選択色 ${color.hex}`} className={styles.swatch} style={{ backgroundColor: color.hex }} />
     <div className={styles.groups}>
-      <label className={styles.field}><span>HEX</span><input value={hex} maxLength={7} onChange={(event) => emitHex(event.target.value)} /></label>
-      <fieldset className={styles.group}><legend>RGB</legend>{numberInput('R', rgb.r, (value) => emitRgb({ r: value }), 0, 255)}{numberInput('G', rgb.g, (value) => emitRgb({ g: value }), 0, 255)}{numberInput('B', rgb.b, (value) => emitRgb({ b: value }), 0, 255)}</fieldset>
-      <fieldset className={styles.group}><legend>HSV</legend>{numberInput('H', hsv.h, (value) => emitHsv({ h: value }), 0, 360)}{numberInput('S', hsv.s, (value) => emitHsv({ s: value }), 0, 100)}{numberInput('V', hsv.v, (value) => emitHsv({ v: value }), 0, 100)}</fieldset>
+      <label className={styles.field}><span>HEX</span><input value={hex} maxLength={7} onChange={(event) => emitHex(event.target.value)} /><button type="button" onClick={() => copy(hex)}>コピー</button></label>
+      <fieldset className={styles.group}><legend>RGB</legend>{numberInput('R', rgb.r, (value) => emitRgb({ r: value }), 0, 255)}{numberInput('G', rgb.g, (value) => emitRgb({ g: value }), 0, 255)}{numberInput('B', rgb.b, (value) => emitRgb({ b: value }), 0, 255)}<button type="button" onClick={() => copy(`rgb(${rgb.r},${rgb.g},${rgb.b})`)}>コピー</button></fieldset>
+      <fieldset className={styles.group}><legend>HSV</legend>{numberInput('H', hsv.h, (value) => emitHsv({ h: value }), 0, 360)}{numberInput('S', hsv.s, (value) => emitHsv({ s: value }), 0, 100)}{numberInput('V', hsv.v, (value) => emitHsv({ v: value }), 0, 100)}<button type="button" onClick={() => copy(`hsv(${hsv.h}, ${hsv.s}%, ${hsv.v}%)`)}>コピー</button></fieldset>
     </div>
   </section>;
 }

@@ -131,12 +131,19 @@ export default function ImagePicker({ onColorPick, onColorPreview }: ImagePicker
           </div>
           <label>
             拡大率
-            <input type="range" min="0.25" max="4" step="0.05" value={zoom} onChange={(event) => setZoom(Number(event.target.value))} />
-            {' '}{Math.round(zoom * 100)}%
+            <input
+              type="range"
+              min="0.25"
+              max="4"
+              step="0.05"
+              value={zoom}
+              onInput={(event) => setZoom(Number(event.currentTarget.value))}
+              onChange={(event) => setZoom(Number(event.currentTarget.value))}
+            />
+            <output key={zoom}>{Math.round(zoom * 100)}%</output>
           </label>
         </>
       )}
     </section>
   );
 }
-
