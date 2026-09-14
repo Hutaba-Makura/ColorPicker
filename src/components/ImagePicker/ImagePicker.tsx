@@ -2,6 +2,7 @@
 import type { ChangeEvent, DragEvent, PointerEvent, WheelEvent } from 'react';
 import type { Color } from '@/types/color';
 import { colorFromRgb } from '@/utils/color';
+import { ZoomIn, ZoomOut } from 'lucide-react';
 import styles from './ImagePicker.module.css';
 
 type ImagePickerProps = {
@@ -129,9 +130,10 @@ export default function ImagePicker({ onColorPick, onColorPreview }: ImagePicker
               onPointerCancel={handlePointerCancel}
             />
           </div>
-          <label>
-            拡大率
+          <label className="mx-auto flex w-full max-w-2xl items-center justify-center gap-4 text-2xl font-semibold">
+            <ZoomOut onClick={(() => setZoom(zoom-0.1))}/>
             <input
+              className="h-4 w-96 accent-blue-600"
               type="range"
               min="0.25"
               max="4"
@@ -140,7 +142,8 @@ export default function ImagePicker({ onColorPick, onColorPreview }: ImagePicker
               onInput={(event) => setZoom(Number(event.currentTarget.value))}
               onChange={(event) => setZoom(Number(event.currentTarget.value))}
             />
-            <output key={zoom}>{Math.round(zoom * 100)}%</output>
+            <ZoomIn onClick={(() => setZoom(zoom+0.1))}/>
+            <output className="min-w-24 text-center text-3xl tabular-nums" key={zoom}>{Math.round(zoom * 100)}%</output>
           </label>
         </>
       )}

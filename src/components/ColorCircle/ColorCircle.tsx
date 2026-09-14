@@ -43,13 +43,6 @@ export default function ColorCircle({ hsv, onPreview, onChange }: ColorCirclePro
         <ColorWheel.SaturationSlider className="w-full" />
         <ColorWheel.BrightnessSlider className="w-full" />
       </div>
-
-      {/* 色の表示とHEX入力 */}
-      <div className="mt-4 flex items-center gap-3">
-        <ColorWheel.Swatch className="h-8 w-8 rounded border" />
-        <ColorWheel.HexInput className="w-24 rounded border px-2 py-1" />
-        <ColorWheel.CopyButton className="rounded border px-2 py-1">Copy</ColorWheel.CopyButton>
-      </div>
     </ColorWheel.Root>
   </div>;
 }
