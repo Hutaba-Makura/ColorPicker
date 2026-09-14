@@ -15,16 +15,17 @@ export default function App() {
     colorHistory.add(color);
   };
 
+  const previewHsv = (hsv: Parameters<typeof colorFromHsv>[0]) => picker.selectColor(colorFromHsv(hsv));
   return (
     <main className={styles.app}>
+      <section className={styles.imageArea}>
+        <ImagePicker onColorPreview={picker.selectColor} onColorPick={commitColor} />
+      </section>
       <aside className={styles.sidebar}>
-        <ColorCircle hsv={picker.color.hsv} onChange={(hsv) => commitColor(colorFromHsv(hsv))} />
-        <ColorData color={picker.color} />
+        <ColorCircle hsv={picker.color.hsv} onPreview={previewHsv} onChange={(hsv) => commitColor(colorFromHsv(hsv))} />
+        <ColorData color={picker.color} onChange={commitColor} />
         <ColorHistory history={colorHistory.history} onSelect={commitColor} />
       </aside>
-      <section className={styles.imageArea}>
-        <ImagePicker onColorPick={commitColor} />
-      </section>
     </main>
   );
 }

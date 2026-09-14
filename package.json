@@ -12,7 +12,8 @@
   "dependencies": {
     "culori": "^4.0.2",
     "react": "^19.2.8",
-    "react-dom": "^19.2.8"
+    "react-dom": "^19.2.8",
+    "react-hsv-ring": "^0.1.9"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

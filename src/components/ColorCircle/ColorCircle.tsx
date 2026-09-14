@@ -1,11 +1,40 @@
-import type { PointerEvent } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import * as ColorWheel from 'react-hsv-ring';
 import type { HSV } from '@/types/color';
+import { colorFromHex } from '@/utils/color';
 import styles from './ColorCircle.module.css';
 
-type ColorCircleProps = { hsv: HSV; onChange: (hsv: HSV) => void };
+type ColorCircleProps = { hsv: HSV; onPreview?: (hsv: HSV) => void; onChange: (hsv: HSV) => void };
 
-export default function ColorCircle({ hsv, onChange }: ColorCircleProps) {
-  const selectHue = (e: PointerEvent<HTMLDivElement>) => { const r = e.currentTarget.getBoundingClientRect(); const a = Math.atan2(e.clientY - r.top - r.height / 2, e.clientX - r.left - r.width / 2); onChange({ ...hsv, h: (a * 180) / Math.PI + 90 }); };
-  const selectSv = (e: PointerEvent<HTMLDivElement>) => { const r = e.currentTarget.getBoundingClientRect(); onChange({ ...hsv, s: Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)), v: Math.max(0, Math.min(1, 1 - (e.clientY - r.top) / r.height)) }); };
-  return <div className={styles.picker}><div className={styles.hueRing} onPointerDown={selectHue} role="slider" aria-label="色相" /><div className={styles.svSquare} style={{ background: `linear-gradient(to top, #000, transparent), linear-gradient(to right, #fff, hsl(${hsv.h} 100% 50%))` }} onPointerDown={selectSv} role="slider" aria-label="彩度と明度" /></div>;
+const hsvToHex = (hsv: HSV) => {
+  const h = hsv.h / 60;
+  const i = Math.floor(h);
+  const f = h - i;
+  const p = hsv.v * (1 - hsv.s);
+  const q = hsv.v * (1 - hsv.s * f);
+  const t = hsv.v * (1 - hsv.s * (1 - f));
+  const values = [[hsv.v, t, p], [q, hsv.v, p], [p, hsv.v, t], [p, q, hsv.v], [t, p, hsv.v], [hsv.v, p, q]][i % 6];
+  return `#${values.map((v) => Math.round(v * 255).toString(16).padStart(2, '0')).join('')}`;
+};
+
+export default function ColorCircle({ hsv, onPreview, onChange }: ColorCircleProps) {
+  const [value, setValue] = useState(hsvToHex(hsv));
+  const lastValue = useRef(value);
+  useEffect(() => setValue(hsvToHex(hsv)), [hsv]);
+  const handleValueChange = (next: string) => {
+    setValue(next); lastValue.current = next;
+    const color = colorFromHex(next);
+    if (color) onPreview?.(color.hsv);
+  };
+  const commit = () => { const color = colorFromHex(lastValue.current); if (color) onChange(color.hsv); };
+  return <div className={styles.libraryPicker} onPointerUp={commit}>
+    <ColorWheel.Root value={value} onValueChange={handleValueChange}>
+      <ColorWheel.Wheel size={240} ringWidth={24}>
+        <ColorWheel.HueRing />
+        <ColorWheel.HueThumb />
+        <ColorWheel.Area />
+        <ColorWheel.AreaThumb />
+      </ColorWheel.Wheel>
+    </ColorWheel.Root>
+  </div>;
 }

@@ -1,3 +1,54 @@
-.picker { position: relative; width: 240px; height: 240px; }
-.hueRing { width: 100%; height: 100%; border-radius: 50%; cursor: crosshair; background: conic-gradient(red, yellow, lime, cyan, blue, magenta, red); }
-.svSquare { position: absolute; inset: 38px; cursor: crosshair; }
+.picker {
+  position: relative;
+  width: 240px;
+  height: 240px;
+  touch-action: none;
+  user-select: none;
+}
+
+.hueRing {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  cursor: crosshair;
+  background: conic-gradient(from 0deg, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000);
+  -webkit-mask: radial-gradient(circle, transparent 0 78%, #000 79% 100%);
+  mask: radial-gradient(circle, transparent 0 78%, #000 79% 100%);
+}
+
+.hueMarker {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 18px;
+  height: 18px;
+  margin: -9px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px #222;
+  pointer-events: none;
+  transform-origin: center 87px;
+}
+
+.svSquare {
+  position: absolute;
+  inset: 48px;
+  overflow: visible;
+  cursor: crosshair;
+}
+
+.selecting {
+  cursor: crosshair;
+}
+
+.svMarker {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  margin: -7px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px #222;
+  pointer-events: none;
+}
+.libraryPicker { width: 240px; height: 240px; touch-action: none; }

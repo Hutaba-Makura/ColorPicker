@@ -1,5 +1,4 @@
-export const RGB2HSV = (RGBColor: RGB)
-import { converter, formatHex } from 'culori';
+import { converter, formatHex, parse } from 'culori';
 import type { Color, HSV, RGB } from '@/types/color';
 
 const toHsv = converter('hsv');
@@ -80,4 +79,11 @@ export const colorFromRgb = (rgb: RGB): Color => {
     hsv: rgbToHsv(normalizedRgb),
     hex: rgbToHex(normalizedRgb),
   };
+};
+
+/** HEXから完全な色情報を生成する。無効な値はnullを返す。 */
+export const colorFromHex = (hex: string): Color | null => {
+  const parsed = parse(hex);
+  if (!parsed || parsed.mode !== 'rgb') return null;
+  return colorFromRgb({ r: (parsed.r ?? 0) * 255, g: (parsed.g ?? 0) * 255, b: (parsed.b ?? 0) * 255 });
 };
