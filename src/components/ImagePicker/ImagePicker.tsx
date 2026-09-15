@@ -109,8 +109,7 @@ export default function ImagePicker({ onColorPick, onColorPreview }: ImagePicker
 
   return (
     <section className={styles.picker} onDragOver={(event) => event.preventDefault()} onDrop={handleDrop}>
-      <label>
-        画像を選択
+      <label className={styles.inputLabel}>
         <input className={styles.input} type="file" accept="image/png,image/jpeg,image/webp,image/gif" onChange={handleFileChange} />
       </label>
       {imageUrl && (
@@ -130,10 +129,13 @@ export default function ImagePicker({ onColorPick, onColorPreview }: ImagePicker
               onPointerCancel={handlePointerCancel}
             />
           </div>
-          <label className="mx-auto flex w-full max-w-2xl items-center justify-center gap-4 text-2xl font-semibold">
-            <ZoomOut onClick={(() => setZoom(zoom-0.1))}/>
+          <div className={styles.zoomControls} role="group" aria-label="画像の拡大率">
+            <button className={styles.zoomButton} type="button" aria-label="縮小" onClick={() => setZoom((value) => Math.max(0.25, value - 0.1))}>
+              <ZoomOut size={22} aria-hidden="true" />
+            </button>
             <input
-              className="h-4 w-96 accent-blue-600"
+              className={styles.zoomRange}
+              aria-label="拡大率"
               type="range"
               min="0.25"
               max="4"
@@ -142,9 +144,11 @@ export default function ImagePicker({ onColorPick, onColorPreview }: ImagePicker
               onInput={(event) => setZoom(Number(event.currentTarget.value))}
               onChange={(event) => setZoom(Number(event.currentTarget.value))}
             />
-            <ZoomIn onClick={(() => setZoom(zoom+0.1))}/>
-            <output className="min-w-24 text-center text-3xl tabular-nums" key={zoom}>{Math.round(zoom * 100)}%</output>
-          </label>
+            <button className={styles.zoomButton} type="button" aria-label="拡大" onClick={() => setZoom((value) => Math.min(4, value + 0.1))}>
+              <ZoomIn size={22} aria-hidden="true" />
+            </button>
+            <output className={styles.zoomOutput}>{Math.round(zoom * 100)}%</output>
+          </div>
         </>
       )}
     </section>

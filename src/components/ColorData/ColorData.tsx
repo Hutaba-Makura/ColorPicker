@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react';
-import type { Color, HSV, RGB } from '@/types/color';
+import type { Color, HSV } from '@/types/color';
 import { colorFromHsv, colorFromRgb } from '@/utils/color';
+import { Copy } from 'lucide-react';
 import styles from './ColorData.module.css';
 
 type ColorDataProps = { color: Color; onChange?: (color: Color) => void };
 const toHexInput = (hex: string) => hex.toUpperCase();
 
 export default function ColorData({ color, onChange }: ColorDataProps) {
+  const [copyStatus, setCopyStatus] = useState('');
   const [hex, setHex] = useState(toHexInput(color.hex));
   const [rgb, setRgb] = useState({ r: String(color.rgb.r), g: String(color.rgb.g), b: String(color.rgb.b) });
   const [hsv, setHsv] = useState({ h: String(Math.round(color.hsv.h)), s: String(Math.round(color.hsv.s * 100)), v: String(Math.round(color.hsv.v * 100)) });
@@ -36,14 +38,55 @@ export default function ColorData({ color, onChange }: ColorDataProps) {
   const numberInput = (label: string, value: string, onValue: (value: string) => void, min: number, max: number) => (
     <label className={styles.field}><span>{label}</span><input type="number" value={value} min={min} max={max} step="any" onChange={(event) => onValue(event.target.value)} /></label>
   );
-  const copy = (value: string) => { void navigator.clipboard?.writeText(value); };
+  const copy = async (format: string, value: string) => {
+    try {
+      await navigator.clipboard.writeText(value);
+      setCopyStatus(`${format}をコピーしました`);
+    } catch {
+      setCopyStatus('コピーできませんでした');
+    }
+  };
+  const copyButton = (format: string, value: string) => (
+    <button
+      className={styles.copyButton}
+      type="button"
+      title={`${format}をコピー`}
+      aria-label={`${format}をコピー`}
+      onClick={() => { void copy(format, value); }}
+    >
+      <Copy size={18} strokeWidth={1.75} aria-hidden="true" />
+    </button>
+  );
 
   return <section className={styles.data} aria-label="選択中の色">
     <div aria-label={`選択色 ${color.hex}`} className={styles.swatch} style={{ backgroundColor: color.hex }} />
     <div className={styles.groups}>
-      <label className={styles.field}><span>HEX</span><input value={hex} maxLength={7} onChange={(event) => emitHex(event.target.value)} /><button type="button" onClick={() => copy(hex)}>コピー</button></label>
-      <fieldset className={styles.group}><legend>RGB</legend>{numberInput('R', rgb.r, (value) => emitRgb({ r: value }), 0, 255)}{numberInput('G', rgb.g, (value) => emitRgb({ g: value }), 0, 255)}{numberInput('B', rgb.b, (value) => emitRgb({ b: value }), 0, 255)}<button type="button" onClick={() => copy(`rgb(${rgb.r},${rgb.g},${rgb.b})`)}>コピー</button></fieldset>
-      <fieldset className={styles.group}><legend>HSV</legend>{numberInput('H', hsv.h, (value) => emitHsv({ h: value }), 0, 360)}{numberInput('S', hsv.s, (value) => emitHsv({ s: value }), 0, 100)}{numberInput('V', hsv.v, (value) => emitHsv({ v: value }), 0, 100)}<button type="button" onClick={() => copy(`hsv(${hsv.h}, ${hsv.s}%, ${hsv.v}%)`)}>コピー</button></fieldset>
+      <div className={styles.hexRow}>
+        <label className={styles.field}>
+          <span>HEX</span>
+          <input className={styles.hexInput} value={hex} maxLength={7} spellCheck={false} onChange={(event) => emitHex(event.target.value)} />
+        </label>
+        {copyButton('HEX', color.hex.toUpperCase())}
+      </div>
+      <fieldset className={styles.group}>
+        <legend>RGB</legend>
+        <div className={styles.valueRow}>
+          {numberInput('R', rgb.r, (value) => emitRgb({ r: value }), 0, 255)}
+          {numberInput('G', rgb.g, (value) => emitRgb({ g: value }), 0, 255)}
+          {numberInput('B', rgb.b, (value) => emitRgb({ b: value }), 0, 255)}
+          {copyButton('RGB', `rgb(${color.rgb.r},${color.rgb.g},${color.rgb.b})`)}
+        </div>
+      </fieldset>
+      <fieldset className={styles.group}>
+        <legend>HSV</legend>
+        <div className={styles.valueRow}>
+          {numberInput('H (°)', hsv.h, (value) => emitHsv({ h: value }), 0, 360)}
+          {numberInput('S (%)', hsv.s, (value) => emitHsv({ s: value }), 0, 100)}
+          {numberInput('V (%)', hsv.v, (value) => emitHsv({ v: value }), 0, 100)}
+          {copyButton('HSV', `hsv(${Math.round(color.hsv.h)}, ${Math.round(color.hsv.s * 100)}%, ${Math.round(color.hsv.v * 100)}%)`)}
+        </div>
+      </fieldset>
     </div>
+    <p className={styles.copyStatus} role="status">{copyStatus}</p>
   </section>;
 }

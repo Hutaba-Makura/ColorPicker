@@ -1,1 +1,13 @@
-.libraryPicker { width: 240px; min-height: 330px; touch-action: none; }
+@reference "../../index.css";
+
+.libraryPicker {
+  @apply w-60 max-w-full touch-none;
+}
+
+.sliders {
+  @apply mt-5 flex flex-col gap-4;
+}
+
+.slider {
+  @apply w-full rounded-full;
+}

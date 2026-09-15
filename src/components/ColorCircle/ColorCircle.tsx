@@ -38,10 +38,10 @@ export default function ColorCircle({ hsv, onPreview, onChange }: ColorCirclePro
       </ColorWheel.Wheel>
 
       {/* 各種スライダー */}
-      <div className="mt-4 flex flex-col gap-3">
-        <ColorWheel.HueSlider className="w-full" />
-        <ColorWheel.SaturationSlider className="w-full" />
-        <ColorWheel.BrightnessSlider className="w-full" />
+      <div className={styles.sliders}>
+        <ColorWheel.HueSlider className={styles.slider} />
+        <ColorWheel.SaturationSlider className={styles.slider} />
+        <ColorWheel.BrightnessSlider className={styles.slider} />
       </div>
     </ColorWheel.Root>
   </div>;

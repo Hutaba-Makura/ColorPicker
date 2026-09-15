@@ -1,39 +1,63 @@
-﻿.picker {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+@reference "../../index.css";
+
+.picker {
+  @apply flex max-w-full flex-col gap-4;
   width: min(60vw, 850px);
-  max-width: 100%;
-  height: 90%;
 }
 
-.input { 
-  max-width: 100%;
-  cursor: pointer;
- }
+.inputLabel {
+  @apply block cursor-pointer rounded-xl border border-slate-200 bg-white p-3 shadow-sm;
+}
+
+.input {
+  @apply w-full max-w-full cursor-pointer text-sm text-slate-500;
+}
+
+.input::file-selector-button {
+  @apply mr-3 cursor-pointer rounded-lg border-0 bg-indigo-50 px-4 py-2 text-sm font-semibold text-indigo-700;
+}
+
+.input:focus-visible {
+  @apply rounded-lg outline-none ring-2 ring-indigo-500 ring-offset-2;
+}
 
 .viewport {
-  width: 100%;
+  @apply w-full overflow-auto rounded-2xl border border-slate-200 bg-white shadow-sm;
   height: 88vh;
-  overflow: auto;
-  border: 1px solid #ccc;
-  /* PNG transparency preview background */
-  background-color: #fff;
   background-image:
-    linear-gradient(45deg, #d8d8d8 25%, transparent 25%),
-    linear-gradient(-45deg, #d8d8d8 25%, transparent 25%),
-    linear-gradient(45deg, transparent 75%, #d8d8d8 75%),
-    linear-gradient(-45deg, transparent 75%, #d8d8d8 75%);
+    linear-gradient(45deg, #e2e8f0 25%, transparent 25%),
+    linear-gradient(-45deg, #e2e8f0 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #e2e8f0 75%),
+    linear-gradient(-45deg, transparent 75%, #e2e8f0 75%);
   background-size: 16px 16px;
   background-position: 0 0, 0 8px, 8px -8px, -8px 0;
 }
 
 .image {
-  display: block;
-  max-width: 100%;
-  height: auto;
-  cursor: crosshair;
-  user-select: none;
+  @apply block h-auto max-w-full cursor-crosshair touch-none select-none;
   -webkit-user-drag: none;
-  touch-action: none;
+}
+
+.zoomControls {
+  @apply mx-auto flex w-full max-w-2xl items-center gap-3 rounded-xl border border-slate-200 bg-white p-3 shadow-sm;
+}
+
+.zoomButton {
+  @apply flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-lg text-slate-500 transition-colors;
+}
+
+.zoomButton:hover {
+  @apply bg-indigo-50 text-indigo-600;
+}
+
+.zoomButton:focus-visible {
+  @apply outline-none ring-2 ring-indigo-500;
+}
+
+.zoomRange {
+  @apply h-4 min-w-0 flex-1 cursor-pointer accent-indigo-600;
+}
+
+.zoomOutput {
+  @apply w-24 shrink-0 text-center text-3xl font-semibold tabular-nums text-slate-700;
 }
