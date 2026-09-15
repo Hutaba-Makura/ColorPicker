@@ -33,3 +33,7 @@
 .imageArea {
   @apply col-start-1 row-start-1 flex min-h-0 min-w-0 items-start;
 }
+
+.authorLink {
+  @apply fixed bottom-3 left-3 text-sm text-slate-500 hover:text-slate-700 hover:underline;
+}
