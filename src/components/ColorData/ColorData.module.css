@@ -5,8 +5,7 @@
 }
 
 .swatch {
-  @apply w-full rounded-xl border border-black/10;
-  aspect-ratio: 5 / 1;
+  @apply aspect-[5/1] w-full shrink-0 rounded-xl border border-black/10;
 }
 
 .groups {
@@ -75,5 +74,9 @@
 }
 
 .copyStatus {
-  @apply m-0 min-h-5 text-xs text-stone-500;
+  @apply m-0 text-xs text-stone-500;
+}
+
+.copyStatus:empty {
+  display: none;
 }

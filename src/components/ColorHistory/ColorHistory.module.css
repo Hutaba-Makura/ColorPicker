@@ -1,7 +1,7 @@
 @reference "../../index.css";
 
 .history {
-  @apply flex flex-col gap-3 border-t border-stone-100 pt-5;
+  @apply flex flex-col gap-3 border-t border-stone-100 pt-2;
 }
 
 .history h2 {
@@ -9,7 +9,9 @@
 }
 
 .grid {
-  @apply grid grid-cols-5 gap-2;
+  @apply grid justify-center gap-2;
+  /* 4個分のgapを除いた5等分幅の80%。アイテムと列を一緒に縮める。 */
+  grid-template-columns: repeat(5, minmax(0, calc((100% - 8 * var(--spacing)) / 5 * 0.8)));
 }
 
 .item {

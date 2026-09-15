@@ -1,11 +1,15 @@
 @reference "../../index.css";
 
 .libraryPicker {
-  @apply w-60 max-w-full touch-none;
+  @apply min-h-0 w-60 max-w-full touch-none;
 }
 
 .sliders {
   @apply mt-5 flex flex-col gap-4;
+}
+
+.wheel {
+  @apply mx-auto;
 }
 
 .slider {

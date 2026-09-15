@@ -7,11 +7,12 @@
 
 .sidebar {
   @apply scrollbar-neutral;
-  @apply col-start-2 row-start-1 flex min-h-0 min-w-0 flex-col gap-6 overflow-y-auto rounded-2xl border border-slate-200 bg-white p-4 shadow-sm;
+  @apply col-start-2 row-start-1 grid min-h-0 min-w-0 content-start gap-4 overflow-y-auto rounded-2xl border border-slate-200 bg-white p-3 shadow-sm;
+  grid-template-rows: auto auto auto;
 }
 
 .colorCircleContainer {
-  @apply flex w-full justify-center;
+  @apply flex min-h-0 w-full justify-center;
 }
 
 .imageArea {
