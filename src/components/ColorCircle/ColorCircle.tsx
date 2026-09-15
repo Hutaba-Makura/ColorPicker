@@ -29,7 +29,12 @@ export default function ColorCircle({ hsv, onPreview, onChange }: ColorCirclePro
     const sidebar = wrapper?.parentElement;
     if (!container || !sliders || !wrapper || !sidebar) return;
     const siblings = Array.from(sidebar.children).filter((child) => child !== wrapper);
+    const mobileLayout = window.matchMedia('(max-width: 1023px)');
     const fitWheel = () => {
+      if (mobileLayout.matches) {
+        setWheelSize(Math.max(112, Math.floor(Math.min(240, container.clientWidth))));
+        return;
+      }
       const margin = Number.parseFloat(getComputedStyle(sliders).marginTop) || 0;
       const sidebarStyle = getComputedStyle(sidebar);
       const padding = (Number.parseFloat(sidebarStyle.paddingTop) || 0)
@@ -47,7 +52,11 @@ export default function ColorCircle({ hsv, onPreview, onChange }: ColorCirclePro
     observer.observe(sidebar);
     observer.observe(sliders);
     siblings.forEach((child) => observer.observe(child));
-    return () => observer.disconnect();
+    mobileLayout.addEventListener('change', fitWheel);
+    return () => {
+      observer.disconnect();
+      mobileLayout.removeEventListener('change', fitWheel);
+    };
   }, []);
 
   const [value, setValue] = useState(() => hsvToHex(hsv));
