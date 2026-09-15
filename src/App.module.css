@@ -1,7 +1,22 @@
 @reference "./index.css";
 
+.page {
+  @apply box-border grid h-dvh min-h-0 grid-cols-[auto_minmax(0,1fr)] gap-3 p-6;
+  /*
+  @apply box-border grid h-dvh min-h-0 grid-cols-[auto_minmax(0,1fr)] gap-3 p-6;
+  */
+}
+
+.header {
+  @apply flex flex-col items-center justify-start;
+}
+
+.logo {
+  @apply block h-auto w-[185px] max-w-full select-none;
+}
+
 .app {
-  @apply box-border grid h-dvh min-h-0 grid-rows-1 justify-center gap-6 p-6;
+  @apply box-border grid h-full min-h-0 grid-rows-1 justify-center gap-6;
   grid-template-columns: minmax(0, max-content) 320px;
 }
 

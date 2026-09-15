@@ -33,7 +33,7 @@
 }
 
 .emptyViewport {
-  @apply flex items-center justify-center overflow-hidden border-dashed border-slate-300 bg-transparent shadow-none;
+  @apply flex items-center justify-center overflow-hidden border-3 border-dashed border-slate-300 bg-transparent shadow-none;
   background-image: none;
 }
 

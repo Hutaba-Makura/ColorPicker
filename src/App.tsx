@@ -5,6 +5,7 @@ import ImagePicker from '@/components/ImagePicker/ImagePicker';
 import { useColorHistory } from '@/hooks/useColorHistory';
 import { useColorPicker } from '@/hooks/useColorPicker';
 import { colorFromHsv } from '@/utils/color';
+import logo from '@/assets/ColorPicker.png';
 import styles from './App.module.css';
 
 export default function App() {
@@ -17,6 +18,10 @@ export default function App() {
 
   const previewHsv = (hsv: Parameters<typeof colorFromHsv>[0]) => picker.selectColor(colorFromHsv(hsv));
   return (
+    <div className={styles.page}>
+      <div className={styles.header}>
+        <img className={styles.logo} src={logo} alt="ColorPicker" width={370} height={92} draggable={false} />
+      </div>
     <main className={styles.app}>
       <section className={styles.imageArea}>
         <ImagePicker onColorPreview={picker.selectColor} onColorPick={commitColor} />
@@ -29,5 +34,6 @@ export default function App() {
         <ColorHistory history={colorHistory.history} onSelect={commitColor} />
       </div>
     </main>
+    </div>
   );
 }
