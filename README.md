@@ -1,75 +1,44 @@
-# React + TypeScript + Vite
+# ColorPicker
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+画像から色を抽出できるカラーピッカーWebアプリです。画像内をクリック(またはズームして精密に選択)して色を拾い、HSVカラーホイールでの微調整、HEX/RGB/HSVでの表示・コピー、選択履歴の確認ができます。
 
-Currently, two official plugins are available:
+## 主な機能
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **画像からの色抽出** — 画像をアップロードし、ズームイン/アウトしながら任意のピクセルの色をピックアップ
+- **カラーホイール** — HSVリング形式のカラーホイールで色相・彩度・明度を直感的に調整
+- **カラー情報表示** — HEX / RGB / HSV 値の表示とワンクリックコピー
+- **選択履歴** — 過去に選択した色を一覧から再選択
 
-## React Compiler
+## 技術スタック
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- [React](https://react.dev/) 19 + [TypeScript](https://www.typescriptlang.org/)
+- [Vite](https://vite.dev/)
+- [Tailwind CSS](https://tailwindcss.com/) v4
+- [culori](https://github.com/Evercoder/culori) — 色空間の変換処理
+- [react-hsv-ring](https://github.com/usapopopooon/react-hsv-ring) — HSVカラーホイールコンポーネント
+- [lucide-react](https://lucide.dev/) — UIアイコン
 
-## Expanding the ESLint configuration
+## セットアップ
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+## スクリプト
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+| コマンド | 内容 |
+| --- | --- |
+| `npm run dev` | 開発サーバーを起動 |
+| `npm run build` | 型チェック後に本番ビルド |
+| `npm run lint` | ESLintによる静的解析 |
+| `npm run preview` | ビルド成果物をローカルでプレビュー |
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## クレジット
 
-```
+- カラーホイールUIに [react-hsv-ring](https://github.com/usapopopooon/react-hsv-ring) を使用しています。
+- 一部アイコンに [line-md](https://github.com/cyberalien/line-md) を使用しています。
+
+## ライセンス
+
+このプロジェクトは [MIT License](./LICENSE) のもとで公開されています。
