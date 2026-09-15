@@ -1,0 +1,84 @@
+@reference "../../index.css";
+
+.picker {
+  @apply flex h-full min-h-0 max-w-full flex-col gap-2;
+  width: min(60vw, 850px);
+}
+
+.inputLabel {
+  @apply block shrink-0 cursor-pointer;
+}
+
+.input {
+  @apply w-full max-w-full cursor-pointer text-sm text-slate-500;
+}
+
+.input::file-selector-button {
+  @apply mr-3 cursor-pointer rounded-lg border-0 bg-stone-300 px-4 py-2 text-sm font-semibold text-stone-800;
+}
+
+.input:focus-visible {
+  @apply rounded-lg outline-none ring-2 ring-stone-500 ring-offset-2;
+}
+
+.viewport {
+  @apply min-h-0 w-full flex-1 overflow-scroll overscroll-contain border border-slate-200 bg-white scrollbar-neutral;
+  background-image:
+    linear-gradient(45deg, #e2e8f0 25%, transparent 25%),
+    linear-gradient(-45deg, #e2e8f0 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #e2e8f0 75%),
+    linear-gradient(-45deg, transparent 75%, #e2e8f0 75%);
+  background-size: 16px 16px;
+  background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+}
+
+.emptyViewport {
+  @apply flex items-center justify-center overflow-hidden border-3 border-dashed border-slate-300 bg-transparent shadow-none;
+  background-image: none;
+}
+
+.emptyContent {
+  @apply flex flex-col items-center gap-3 p-6 text-center text-sm text-slate-500;
+}
+
+.selectButton {
+  @apply cursor-pointer rounded-lg bg-stone-300 px-4 py-2 font-semibold text-stone-800;
+}
+
+.selectButton:focus-visible {
+  @apply outline-none ring-2 ring-stone-500 ring-offset-2;
+}
+
+.imageCanvas {
+  @apply relative;
+  overflow-anchor: none;
+}
+
+.image {
+  @apply absolute block max-w-none cursor-crosshair touch-none select-none;
+  -webkit-user-drag: none;
+}
+
+.zoomControls {
+  @apply mx-auto flex w-full max-w-2xl shrink-0 items-center gap-3 px-3 py-2;
+}
+
+.zoomButton {
+  @apply flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-lg text-slate-500 transition-colors;
+}
+
+.zoomButton:hover {
+  @apply bg-stone-300 text-stone-800;
+}
+
+.zoomButton:focus-visible {
+  @apply outline-none ring-2 ring-stone-500;
+}
+
+.zoomRange {
+  @apply h-4 min-w-0 flex-1 cursor-pointer accent-stone-600;
+}
+
+.zoomOutput {
+  @apply w-24 shrink-0 text-center text-3xl font-semibold tabular-nums text-slate-700;
+}
