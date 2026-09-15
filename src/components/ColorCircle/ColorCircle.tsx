@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 import * as ColorWheel from 'react-hsv-ring';
 import type { HSV } from '@/types/color';
 import { colorFromHex } from '@/utils/color';
@@ -50,9 +50,13 @@ export default function ColorCircle({ hsv, onPreview, onChange }: ColorCirclePro
     return () => observer.disconnect();
   }, []);
 
-  const [value, setValue] = useState(hsvToHex(hsv));
+  const [value, setValue] = useState(() => hsvToHex(hsv));
+  const [renderedHsv, setRenderedHsv] = useState(hsv);
   const lastValue = useRef(value);
-  useEffect(() => setValue(hsvToHex(hsv)), [hsv]);
+  if (hsv !== renderedHsv) {
+    setRenderedHsv(hsv);
+    setValue(hsvToHex(hsv));
+  }
   const handleValueChange = (next: string) => {
     setValue(next); lastValue.current = next;
     const color = colorFromHex(next);

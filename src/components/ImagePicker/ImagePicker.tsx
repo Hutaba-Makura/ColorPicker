@@ -224,7 +224,7 @@ export default function ImagePicker({ onColorPick, onColorPreview }: ImagePicker
           </div>
         ) : (
           <div className={styles.emptyContent}>
-            <button type="button" className={styles.selectButton} onClick={() => inputRef.current?.click()}>画像を選択</button>
+            <button type="button" className={styles.selectButton} onClick={() => inputRef.current?.click()}>ファイルを選択</button>
             <span>PNG・JPEG・WebP・GIF</span>
           </div>
         )}
