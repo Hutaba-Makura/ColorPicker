@@ -37,3 +37,30 @@
 .authorLink {
   @apply fixed bottom-3 left-3 text-sm text-slate-500 hover:text-slate-700 hover:underline;
 }
+
+@media (max-width: 1023px) {
+  .page {
+    @apply h-auto min-h-dvh grid-cols-1 gap-4 p-4;
+  }
+
+  .header {
+    @apply items-start;
+  }
+
+  .app {
+    @apply h-auto min-w-0 grid-cols-1 gap-4;
+    grid-template-rows: auto auto;
+  }
+
+  .imageArea {
+    @apply col-start-1 row-start-1;
+  }
+
+  .sidebar {
+    @apply col-start-1 row-start-2 overflow-visible;
+  }
+
+  .authorLink {
+    @apply static justify-self-start p-2;
+  }
+}

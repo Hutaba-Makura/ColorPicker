@@ -22,6 +22,7 @@
 }
 
 .viewport {
+  touch-action: none;
   @apply min-h-0 w-full flex-1 overflow-scroll overscroll-contain border border-slate-200 bg-white scrollbar-neutral;
   background-image:
     linear-gradient(45deg, #e2e8f0 25%, transparent 25%),
@@ -33,6 +34,7 @@
 }
 
 .emptyViewport {
+  touch-action: auto;
   @apply flex items-center justify-center overflow-hidden border-3 border-dashed border-slate-300 bg-transparent shadow-none;
   background-image: none;
 }
@@ -81,4 +83,22 @@
 
 .zoomOutput {
   @apply w-24 shrink-0 text-center text-3xl font-semibold tabular-nums text-slate-700;
+}
+
+@media (max-width: 1023px) {
+  .picker {
+    @apply h-auto w-full;
+  }
+
+  .viewport {
+    @apply h-[40dvh] flex-none;
+  }
+
+  .zoomControls {
+    @apply gap-2 px-0;
+  }
+
+  .zoomOutput {
+    @apply w-20 text-2xl;
+  }
 }

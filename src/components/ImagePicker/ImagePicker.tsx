@@ -10,6 +10,9 @@ type ImagePickerProps = {
   onColorPreview?: (color: Color) => void;
 };
 
+type TouchPoint = { clientX: number; clientY: number };
+type Pinch = { distance: number; zoom: number; x: number; y: number };
+
 export default function ImagePicker({ onColorPick, onColorPreview }: ImagePickerProps) {
   const imageRef = useRef<HTMLImageElement>(null);
   const viewportRef = useRef<HTMLDivElement>(null);
@@ -19,6 +22,10 @@ export default function ImagePicker({ onColorPick, onColorPreview }: ImagePicker
   const [zoomPercent, setZoomPercent] = useState(100);
   const zoom = zoomPercent / 100;
   const pickingRef = useRef(false);
+  const touchesRef = useRef(new Map<number, TouchPoint>());
+  const pinchRef = useRef<Pinch | null>(null);
+  const hadPinchRef = useRef(false);
+  const touchPickingRef = useRef(false);
   const zoomRef = useRef(100);
   const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
   const [viewportSize, setViewportSize] = useState({ width: 0, height: 0 });
@@ -100,6 +107,10 @@ export default function ImagePicker({ onColorPick, onColorPreview }: ImagePicker
     setImageUrl(URL.createObjectURL(file));
     setImageSize({ width: 0, height: 0 });
     zoomAnchor.current = null;
+    touchesRef.current.clear();
+    pinchRef.current = null;
+    hadPinchRef.current = false;
+    touchPickingRef.current = false;
     zoomRef.current = 100;
     setZoomPercent(100);
   };
@@ -115,7 +126,7 @@ export default function ImagePicker({ onColorPick, onColorPreview }: ImagePicker
     if (file) loadImage(file);
   };
 
-  const pickAt = (event: PointerEvent<HTMLImageElement>, commit: boolean) => {
+  const pickAt = (event: TouchPoint, commit: boolean) => {
     const image = imageRef.current;
     if (!image || !image.complete || !image.naturalWidth || !image.naturalHeight) return;
     const rect = image.getBoundingClientRect();
@@ -146,6 +157,7 @@ export default function ImagePicker({ onColorPick, onColorPreview }: ImagePicker
   };
 
   const handlePointerDown = (event: PointerEvent<HTMLImageElement>) => {
+    if (event.pointerType === 'touch') return;
     if (event.button !== 0) return;
     event.preventDefault();
     pickingRef.current = true;
@@ -154,12 +166,14 @@ export default function ImagePicker({ onColorPick, onColorPreview }: ImagePicker
   };
 
   const handlePointerMove = (event: PointerEvent<HTMLImageElement>) => {
+    if (event.pointerType === 'touch') return;
     if (!pickingRef.current) return;
     event.preventDefault();
     pickAt(event, false);
   };
 
   const handlePointerUp = (event: PointerEvent<HTMLImageElement>) => {
+    if (event.pointerType === 'touch') return;
     if (!pickingRef.current) return;
     event.preventDefault();
     pickAt(event, true);
@@ -170,9 +184,92 @@ export default function ImagePicker({ onColorPick, onColorPreview }: ImagePicker
   };
 
   const handlePointerCancel = (event: PointerEvent<HTMLImageElement>) => {
+    if (event.pointerType === 'touch') return;
     pickingRef.current = false;
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
       event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+  };
+
+  const beginPinch = () => {
+    const [first, second] = [...touchesRef.current.values()];
+    const bounds = imageRef.current?.getBoundingClientRect();
+    if (!first || !second || !bounds?.width || !bounds.height) return;
+    pinchRef.current = {
+      distance: Math.max(1, Math.hypot(second.clientX - first.clientX, second.clientY - first.clientY)),
+      zoom: zoomRef.current,
+      x: ((first.clientX + second.clientX) / 2 - bounds.left) / bounds.width,
+      y: ((first.clientY + second.clientY) / 2 - bounds.top) / bounds.height,
+    };
+  };
+
+  const handleTouchDown = (event: PointerEvent<HTMLDivElement>) => {
+    if (event.pointerType !== 'touch' || !imageSize.width) return;
+    event.preventDefault();
+    event.currentTarget.setPointerCapture(event.pointerId);
+    touchesRef.current.set(event.pointerId, { clientX: event.clientX, clientY: event.clientY });
+    if (touchesRef.current.size >= 2) {
+      hadPinchRef.current = true;
+      touchPickingRef.current = false;
+      beginPinch();
+    } else if (!hadPinchRef.current) {
+      const bounds = imageRef.current?.getBoundingClientRect();
+      touchPickingRef.current = Boolean(bounds && event.clientX >= bounds.left && event.clientX <= bounds.right
+        && event.clientY >= bounds.top && event.clientY <= bounds.bottom);
+      if (touchPickingRef.current) pickAt(event, false);
+    }
+  };
+
+  const handleTouchMove = (event: PointerEvent<HTMLDivElement>) => {
+    if (event.pointerType !== 'touch' || !touchesRef.current.has(event.pointerId)) return;
+    event.preventDefault();
+    touchesRef.current.set(event.pointerId, { clientX: event.clientX, clientY: event.clientY });
+    const [first, second] = [...touchesRef.current.values()];
+    const pinch = pinchRef.current;
+    const viewport = viewportRef.current;
+    if (first && second && pinch && viewport) {
+      const distance = Math.hypot(second.clientX - first.clientX, second.clientY - first.clientY);
+      const next = Math.max(25, Math.min(400, Math.round(pinch.zoom * distance / pinch.distance)));
+      const bounds = viewport.getBoundingClientRect();
+      const anchor = {
+        x: pinch.x,
+        y: pinch.y,
+        offsetX: (first.clientX + second.clientX) / 2 - bounds.left - viewport.clientLeft,
+        offsetY: (first.clientY + second.clientY) / 2 - bounds.top - viewport.clientTop,
+      };
+      if (next !== zoomRef.current) {
+        zoomAnchor.current = anchor;
+        zoomRef.current = next;
+        setZoomPercent(next);
+      } else {
+        // 指の間隔が同じ場合も、二本指を動かして画像を移動できる。
+        const imageBounds = imageRef.current?.getBoundingClientRect();
+        if (imageBounds) {
+          viewport.scrollLeft = viewport.clientWidth + anchor.x * imageBounds.width - anchor.offsetX;
+          viewport.scrollTop = viewport.clientHeight + anchor.y * imageBounds.height - anchor.offsetY;
+        }
+        if (zoomAnchor.current) zoomAnchor.current = anchor;
+      }
+    } else if (!hadPinchRef.current && touchPickingRef.current) {
+      pickAt(event, false);
+    }
+  };
+
+  const finishTouch = (event: PointerEvent<HTMLDivElement>, cancelled: boolean) => {
+    if (event.pointerType !== 'touch' || !touchesRef.current.has(event.pointerId)) return;
+    if (!cancelled && !hadPinchRef.current && touchPickingRef.current) pickAt(event, true);
+    touchesRef.current.delete(event.pointerId);
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+    if (touchesRef.current.size >= 2) {
+      beginPinch();
+    } else {
+      pinchRef.current = null;
+    }
+    if (touchesRef.current.size === 0) {
+      hadPinchRef.current = false;
+      touchPickingRef.current = false;
     }
   };
 
@@ -204,7 +301,15 @@ export default function ImagePicker({ onColorPick, onColorPreview }: ImagePicker
       <label className={styles.inputLabel}>
         <input ref={inputRef} aria-label="ファイルを選択" className={styles.input} type="file" accept="image/png,image/jpeg,image/webp,image/gif" onChange={handleFileChange} />
       </label>
-      <div ref={viewportRef} className={`${styles.viewport} ${imageUrl ? '' : styles.emptyViewport}`}>
+      <div
+        ref={viewportRef}
+        className={`${styles.viewport} ${imageUrl ? '' : styles.emptyViewport}`}
+        onPointerDown={handleTouchDown}
+        onPointerMove={handleTouchMove}
+        onPointerUp={(event) => finishTouch(event, false)}
+        onPointerCancel={(event) => finishTouch(event, true)}
+        onLostPointerCapture={(event) => finishTouch(event, true)}
+      >
         {imageUrl ? (
           <div className={styles.imageCanvas} style={{ width: imageWidth + viewportSize.width * 2, height: imageHeight + viewportSize.height * 2 }}>
             <img
