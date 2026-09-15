@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+﻿import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import type { ChangeEvent, DragEvent, PointerEvent } from 'react';
 import type { Color } from '@/types/color';
 import { colorFromRgb } from '@/utils/color';
@@ -19,6 +19,44 @@ export default function ImagePicker({ onColorPick, onColorPreview }: ImagePicker
   const [zoomPercent, setZoomPercent] = useState(100);
   const zoom = zoomPercent / 100;
   const pickingRef = useRef(false);
+  const zoomRef = useRef(100);
+  const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
+  const [viewportSize, setViewportSize] = useState({ width: 0, height: 0 });
+  const zoomAnchor = useRef<{ x: number; y: number; offsetX: number; offsetY: number } | null>(null);
+  const fitScale = imageSize.width && imageSize.height && viewportSize.width && viewportSize.height
+    ? Math.min(viewportSize.width / imageSize.width, viewportSize.height / imageSize.height)
+    : 1;
+  const imageWidth = imageSize.width * fitScale * zoom;
+  const imageHeight = imageSize.height * fitScale * zoom;
+
+  useLayoutEffect(() => {
+    const viewport = viewportRef.current;
+    if (!viewport) return;
+    const measure = () => {
+      const width = viewport.clientWidth;
+      const height = viewport.clientHeight;
+      setViewportSize((current) => current.width === width && current.height === height
+        ? current : { width, height });
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(viewport);
+    return () => observer.disconnect();
+  }, []);
+
+  useLayoutEffect(() => {
+    const viewport = viewportRef.current;
+    if (!viewport || !imageWidth || !imageHeight) return;
+    const anchor = zoomAnchor.current;
+    if (anchor) {
+      viewport.scrollLeft = viewportSize.width + anchor.x * imageWidth - anchor.offsetX;
+      viewport.scrollTop = viewportSize.height + anchor.y * imageHeight - anchor.offsetY;
+    } else {
+      viewport.scrollLeft = (viewportSize.width + imageWidth) / 2;
+      viewport.scrollTop = (viewportSize.height + imageHeight) / 2;
+    }
+    zoomAnchor.current = null;
+  }, [imageWidth, imageHeight, viewportSize.width, viewportSize.height]);
 
   useLayoutEffect(() => {
     // outputの表示はネイティブvalue経由で同期し、JSXの子テキストと二重管理しない。
@@ -27,11 +65,31 @@ export default function ImagePicker({ onColorPick, onColorPreview }: ImagePicker
     }
   }, [zoomPercent, imageUrl]);
 
-  const updateZoomFromRange = (value: number) => {
-    if (Number.isFinite(value)) {
-      setZoomPercent(Math.max(25, Math.min(400, Math.round(value))));
+  const changeZoom = useCallback((value: number, point?: { clientX: number; clientY: number }) => {
+    if (!Number.isFinite(value)) return;
+    const next = Math.max(25, Math.min(400, Math.round(value)));
+    if (next === zoomRef.current) return;
+    const viewport = viewportRef.current;
+    const image = imageRef.current;
+    if (viewport && image) {
+      const bounds = viewport.getBoundingClientRect();
+      const imageBounds = image.getBoundingClientRect();
+      const left = bounds.left + viewport.clientLeft;
+      const top = bounds.top + viewport.clientTop;
+      const clientX = point?.clientX ?? left + viewport.clientWidth / 2;
+      const clientY = point?.clientY ?? top + viewport.clientHeight / 2;
+      if (imageBounds.width && imageBounds.height) {
+        zoomAnchor.current = {
+          x: (clientX - imageBounds.left) / imageBounds.width,
+          y: (clientY - imageBounds.top) / imageBounds.height,
+          offsetX: clientX - left,
+          offsetY: clientY - top,
+        };
+      }
     }
-  };
+    zoomRef.current = next;
+    setZoomPercent(next);
+  }, []);
 
   useEffect(() => () => {
     if (imageUrl) URL.revokeObjectURL(imageUrl);
@@ -39,10 +97,10 @@ export default function ImagePicker({ onColorPick, onColorPreview }: ImagePicker
 
   const loadImage = (file: File) => {
     if (!file.type.startsWith('image/')) return;
-    setImageUrl((previous) => {
-      if (previous) URL.revokeObjectURL(previous);
-      return URL.createObjectURL(file);
-    });
+    setImageUrl(URL.createObjectURL(file));
+    setImageSize({ width: 0, height: 0 });
+    zoomAnchor.current = null;
+    zoomRef.current = 100;
     setZoomPercent(100);
   };
 
@@ -123,31 +181,38 @@ export default function ImagePicker({ onColorPick, onColorPreview }: ImagePicker
     if (!viewport || !imageUrl) return;
 
     const handleWheel = (event: WheelEvent) => {
-      if (!event.ctrlKey && !event.shiftKey) return;
-      // Reactのwheelイベントではブラウザ側のズームを抑止できない場合がある。
       event.preventDefault();
-      if (event.deltaY === 0) return;
-      setZoomPercent((value) => Math.max(25, Math.min(400,
-        Math.round(value * (event.deltaY < 0 ? 1.1 : 0.9)),
-      )));
+      const unit = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? viewport.clientHeight : 1;
+      const deltaY = event.deltaY * unit;
+      const deltaX = event.deltaX * unit;
+      if (event.ctrlKey) {
+        if (deltaY) changeZoom(zoomRef.current + (deltaY < 0 ? 20 : -20), event);
+      } else if (event.shiftKey) {
+        viewport.scrollLeft += deltaY || deltaX;
+      } else {
+        viewport.scrollTop += deltaY;
+        viewport.scrollLeft += deltaX;
+      }
     };
 
     viewport.addEventListener('wheel', handleWheel, { passive: false });
     return () => viewport.removeEventListener('wheel', handleWheel);
-  }, [imageUrl]);
+  }, [imageUrl, changeZoom]);
 
   return (
     <section className={styles.picker} onDragOver={(event) => event.preventDefault()} onDrop={handleDrop}>
       <label className={styles.inputLabel}>
-        <input ref={inputRef} aria-label="画像を選択" className={styles.input} type="file" accept="image/png,image/jpeg,image/webp,image/gif" onChange={handleFileChange} />
+        <input ref={inputRef} aria-label="ファイルを選択" className={styles.input} type="file" accept="image/png,image/jpeg,image/webp,image/gif" onChange={handleFileChange} />
       </label>
       <div ref={viewportRef} className={`${styles.viewport} ${imageUrl ? '' : styles.emptyViewport}`}>
         {imageUrl ? (
+          <div className={styles.imageCanvas} style={{ width: imageWidth + viewportSize.width * 2, height: imageHeight + viewportSize.height * 2 }}>
             <img
               className={styles.image}
-              style={{ transform: `scale(${zoom})`, transformOrigin: 'center center' }}
+              style={{ width: imageWidth || 1, height: imageHeight || 1, left: viewportSize.width, top: viewportSize.height, visibility: imageSize.width ? 'visible' : 'hidden' }}
               ref={imageRef}
               src={imageUrl}
+              onLoad={(event) => setImageSize({ width: event.currentTarget.naturalWidth, height: event.currentTarget.naturalHeight })}
               alt="画像から色を選択"
               draggable={false}
               onDragStart={(event) => event.preventDefault()}
@@ -156,9 +221,9 @@ export default function ImagePicker({ onColorPick, onColorPreview }: ImagePicker
               onPointerUp={handlePointerUp}
               onPointerCancel={handlePointerCancel}
             />
+          </div>
         ) : (
           <div className={styles.emptyContent}>
-            <p>画像をここにドラッグ＆ドロップ</p>
             <button type="button" className={styles.selectButton} onClick={() => inputRef.current?.click()}>画像を選択</button>
             <span>PNG・JPEG・WebP・GIF</span>
           </div>
@@ -166,7 +231,7 @@ export default function ImagePicker({ onColorPick, onColorPreview }: ImagePicker
       </div>
       {imageUrl && (
           <div className={styles.zoomControls} role="group" aria-label="画像の拡大率">
-            <button className={styles.zoomButton} type="button" aria-label="縮小" onClick={() => setZoomPercent((value) => Math.max(25, value - 10))}>
+            <button className={styles.zoomButton} type="button" aria-label="縮小" onClick={() => changeZoom(zoomRef.current - 10)}>
               <ZoomOut size={22} aria-hidden="true" />
             </button>
             <input
@@ -178,10 +243,10 @@ export default function ImagePicker({ onColorPick, onColorPreview }: ImagePicker
               step="1"
               value={zoomPercent}
               aria-valuetext={`${zoomPercent}%`}
-              onInput={(event) => updateZoomFromRange(event.currentTarget.valueAsNumber)}
-              onChange={(event) => updateZoomFromRange(event.currentTarget.valueAsNumber)}
+              onInput={(event) => changeZoom(event.currentTarget.valueAsNumber)}
+              onChange={(event) => changeZoom(event.currentTarget.valueAsNumber)}
             />
-            <button className={styles.zoomButton} type="button" aria-label="拡大" onClick={() => setZoomPercent((value) => Math.min(400, value + 10))}>
+            <button className={styles.zoomButton} type="button" aria-label="拡大" onClick={() => changeZoom(zoomRef.current + 10)}>
               <ZoomIn size={22} aria-hidden="true" />
             </button>
             <output ref={zoomOutputRef} className={styles.zoomOutput} aria-label="現在の拡大率" translate="no" />
