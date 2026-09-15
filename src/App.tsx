@@ -21,11 +21,13 @@ export default function App() {
       <section className={styles.imageArea}>
         <ImagePicker onColorPreview={picker.selectColor} onColorPick={commitColor} />
       </section>
-      <aside className={styles.sidebar}>
-        <ColorCircle hsv={picker.color.hsv} onPreview={previewHsv} onChange={(hsv) => commitColor(colorFromHsv(hsv))} />
+      <div className={styles.sidebar}>
+        <div className={styles.colorCircleContainer}>
+          <ColorCircle hsv={picker.color.hsv} onPreview={previewHsv} onChange={(hsv) => commitColor(colorFromHsv(hsv))} />
+        </div>
         <ColorData color={picker.color} onChange={commitColor} />
         <ColorHistory history={colorHistory.history} onSelect={commitColor} />
-      </aside>
+      </div>
     </main>
   );
 }
