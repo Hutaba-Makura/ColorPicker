@@ -156,7 +156,7 @@ export default function ImagePicker({ onColorPick, onColorPreview }: ImagePicker
     else onColorPreview?.(color);
   };
 
-  const handlePointerDown = (event: PointerEvent<HTMLImageElement>) => {
+  const handlePointerDown = (event: PointerEvent<HTMLDivElement>) => {
     if (event.pointerType === 'touch') return;
     if (event.button !== 0) return;
     event.preventDefault();
@@ -165,14 +165,14 @@ export default function ImagePicker({ onColorPick, onColorPreview }: ImagePicker
     pickAt(event, false);
   };
 
-  const handlePointerMove = (event: PointerEvent<HTMLImageElement>) => {
+  const handlePointerMove = (event: PointerEvent<HTMLDivElement>) => {
     if (event.pointerType === 'touch') return;
     if (!pickingRef.current) return;
     event.preventDefault();
     pickAt(event, false);
   };
 
-  const handlePointerUp = (event: PointerEvent<HTMLImageElement>) => {
+  const handlePointerUp = (event: PointerEvent<HTMLDivElement>) => {
     if (event.pointerType === 'touch') return;
     if (!pickingRef.current) return;
     event.preventDefault();
@@ -183,7 +183,7 @@ export default function ImagePicker({ onColorPick, onColorPreview }: ImagePicker
     }
   };
 
-  const handlePointerCancel = (event: PointerEvent<HTMLImageElement>) => {
+  const handlePointerCancel = (event: PointerEvent<HTMLDivElement>) => {
     if (event.pointerType === 'touch') return;
     pickingRef.current = false;
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
@@ -320,6 +320,13 @@ export default function ImagePicker({ onColorPick, onColorPreview }: ImagePicker
               onLoad={(event) => setImageSize({ width: event.currentTarget.naturalWidth, height: event.currentTarget.naturalHeight })}
               alt="画像から色を選択"
               draggable={false}
+            />
+            {/* 画像への直接操作(新しいタブで開く・画像を保存等)を防ぐため、透明な要素で操作を受け止める */}
+            <div
+              className={styles.imageOverlay}
+              style={{ width: imageWidth || 1, height: imageHeight || 1, left: viewportSize.width, top: viewportSize.height, visibility: imageSize.width ? 'visible' : 'hidden' }}
+              role="presentation"
+              onContextMenu={(event) => event.preventDefault()}
               onDragStart={(event) => event.preventDefault()}
               onPointerDown={handlePointerDown}
               onPointerMove={handlePointerMove}
