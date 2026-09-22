@@ -1,7 +1,7 @@
 import type { Color, ColorHistoryItem } from '@/types/color';
 
 const STORAGE_KEY = 'color-picker-history';
-export const MAX_HISTORY_ITEMS = 20;
+export const MAX_HISTORY_ITEMS = 15;
 
 const isColor = (value: unknown): value is Color => {
   if (!value || typeof value !== 'object') return false;

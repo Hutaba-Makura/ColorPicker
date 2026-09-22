@@ -15,6 +15,7 @@ export default function App() {
     picker.selectColor(color);
     colorHistory.add(color);
   };
+  const selectHistoryColor = (color: typeof picker.color) => picker.selectColor(color);
 
   const previewHsv = (hsv: Parameters<typeof colorFromHsv>[0]) => picker.selectColor(colorFromHsv(hsv));
   return (
@@ -31,7 +32,7 @@ export default function App() {
           <ColorCircle hsv={picker.color.hsv} onPreview={previewHsv} onChange={(hsv) => commitColor(colorFromHsv(hsv))} />
         </div>
         <ColorData color={picker.color} onChange={commitColor} />
-        <ColorHistory history={colorHistory.history} onSelect={commitColor} />
+        <ColorHistory history={colorHistory.history} onSelect={selectHistoryColor} />
       </div>
     </main>
       <a
