@@ -17,6 +17,8 @@ const hsvToHex = (hsv: HSV) => {
   return `#${values.map((v) => Math.round(v * 255).toString(16).padStart(2, '0')).join('')}`;
 };
 
+const MIN_DESKTOP_WHEEL_SIZE = 200;
+
 export default function ColorCircle({ hsv, onPreview, onChange }: ColorCircleProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const slidersRef = useRef<HTMLDivElement>(null);
@@ -44,7 +46,8 @@ export default function ColorCircle({ hsv, onPreview, onChange }: ColorCirclePro
       // 内容自身の高さを参照すると、縮小→再計測の繰り返しになるため、親の利用可能な高さから計算する。
       const available = sidebar.clientHeight - padding - gaps - otherHeight
         - sliders.getBoundingClientRect().height - margin - 4;
-      setWheelSize(Math.max(112, Math.floor(Math.min(240, container.clientWidth, available))));
+      // 短い画面ではホイールを過度に縮めず、サイドバーをスクロールさせる。
+      setWheelSize(Math.max(MIN_DESKTOP_WHEEL_SIZE, Math.floor(Math.min(720, container.clientWidth, available))));
     };
     fitWheel();
     const observer = new ResizeObserver(fitWheel);

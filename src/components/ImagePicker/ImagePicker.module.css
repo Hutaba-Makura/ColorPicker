@@ -57,8 +57,15 @@
 }
 
 .image {
-  @apply absolute block max-w-none cursor-crosshair touch-none select-none;
+  @apply absolute block max-w-none touch-none select-none;
   -webkit-user-drag: none;
+  pointer-events: none;
+}
+
+.imageOverlay {
+  @apply absolute cursor-crosshair touch-none select-none;
+  -webkit-user-drag: none;
+  -webkit-touch-callout: none;
 }
 
 .zoomControls {
