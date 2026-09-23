@@ -1,7 +1,7 @@
 @reference "../../index.css";
 
 .libraryPicker {
-  @apply w-60 max-w-full touch-none;
+  @apply w-54 max-w-full touch-none;
 }
 
 .sliders {

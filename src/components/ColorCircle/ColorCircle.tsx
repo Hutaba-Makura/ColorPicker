@@ -17,12 +17,12 @@ const hsvToHex = (hsv: HSV) => {
   return `#${values.map((v) => Math.round(v * 255).toString(16).padStart(2, '0')).join('')}`;
 };
 
-const MIN_DESKTOP_WHEEL_SIZE = 200;
+const MIN_DESKTOP_WHEEL_SIZE = 180;
 
 export default function ColorCircle({ hsv, onPreview, onChange }: ColorCircleProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const slidersRef = useRef<HTMLDivElement>(null);
-  const [wheelSize, setWheelSize] = useState(240);
+  const [wheelSize, setWheelSize] = useState(216);
 
   useLayoutEffect(() => {
     const container = containerRef.current;
@@ -34,7 +34,7 @@ export default function ColorCircle({ hsv, onPreview, onChange }: ColorCirclePro
     const mobileLayout = window.matchMedia('(max-width: 1023px)');
     const fitWheel = () => {
       if (mobileLayout.matches) {
-        setWheelSize(Math.max(112, Math.floor(Math.min(240, container.clientWidth))));
+        setWheelSize(Math.max(112, Math.floor(Math.min(216, container.clientWidth))));
         return;
       }
       const margin = Number.parseFloat(getComputedStyle(sliders).marginTop) || 0;
@@ -47,7 +47,7 @@ export default function ColorCircle({ hsv, onPreview, onChange }: ColorCirclePro
       const available = sidebar.clientHeight - padding - gaps - otherHeight
         - sliders.getBoundingClientRect().height - margin - 4;
       // 短い画面ではホイールを過度に縮めず、サイドバーをスクロールさせる。
-      setWheelSize(Math.max(MIN_DESKTOP_WHEEL_SIZE, Math.floor(Math.min(720, container.clientWidth, available))));
+      setWheelSize(Math.max(MIN_DESKTOP_WHEEL_SIZE, Math.floor(Math.min(216, container.clientWidth, available))));
     };
     fitWheel();
     const observer = new ResizeObserver(fitWheel);
